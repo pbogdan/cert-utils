@@ -238,7 +238,7 @@ function buildChain($cert, $certPath)
     try {
         execute($cmd);
     } catch (Exception $e) {
-        throw new Exception("Can't verify the bundle: {$e->outpu}");
+        throw new Exception("Can't verify the bundle: {$e->output}");
     }
 
     // extract the original cert (it might contain some, or all, parts of the
