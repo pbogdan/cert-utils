@@ -141,7 +141,7 @@ function findMatchingRoot($cert)
 function downloadIssuer($uri)
 {
     $hash = sha1($uri);
-    $path = "cache/ca-issuer-$hash.cer";
+    $path = __DIR__ . "/cache/ca-issuer-$hash.cer";
 
     if (!file_exists($path)) {
         $cmd = sprintf(
@@ -214,24 +214,25 @@ function buildChain($cert, $certPath)
             "openssl x509 -inform %s -outform pem -in %s -out %s",
             escapeshellarg($inform),
             escapeshellarg($path),
-            escapeshellarg("tmp/" . sha1($cert["subject"]) . "-$i.pem")
+            escapeshellarg(__DIR__ . "/tmp/" . sha1($cert["subject"]) . "-$i.pem")
         );
         exec($cmd);
     }
 
-    unlink("tmp/bundle.crt");
+    unlink(__DIR__ . "/tmp/bundle.crt");
 
     foreach ($chain as $i => $path) {
         file_put_contents(
-            "tmp/bundle.crt",
-            file_get_contents("tmp/" . sha1($cert["subject"]) . "-$i.pem"),
+            __DIR__ . "/tmp/bundle.crt",
+            file_get_contents(__DIR__ . "/tmp/" . sha1($cert["subject"]) . "-$i.pem"),
             FILE_APPEND
         );
     }
 
     // verify the chain is valid
     $cmd = sprintf(
-        "openssl verify -verbose -purpose sslserver -CAfile tmp/bundle.crt %s",
+        "openssl verify -verbose -purpose sslserver -CAfile %s/tmp/bundle.crt %s",
+        __DIR__,
         escapeshellarg($certPath)
     );
 
@@ -254,8 +255,8 @@ function buildChain($cert, $certPath)
     array_pop($chain); // don't include the root certificate
 
     foreach ($chain as $i => $path) {
-        $out .= file_get_contents("tmp/" . sha1($cert["subject"]) . "-$i.pem");
-        unlink("tmp/" . sha1($cert["subject"]) . "-$i.pem");
+        $out .= file_get_contents(__DIR__ . "/tmp/" . sha1($cert["subject"]) . "-$i.pem");
+        unlink(__DIR__ . "/tmp/" . sha1($cert["subject"]) . "-$i.pem");
     }
 
     return $out;
