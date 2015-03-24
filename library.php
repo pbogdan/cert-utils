@@ -268,7 +268,7 @@ function execute($cmd)
 
     if ($code != 0) {
         $e = new \Exception("Command '$cmd' failed exit code $code");
-        $e->output = $output;
+        $e->output = implode("\n", $output);
         throw $e;
     }
 
