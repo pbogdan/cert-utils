@@ -2,7 +2,7 @@
 
 Collection of random SSL-related utilities written in PHP.
 
-The ```cu``` script in the top-level directory is the common entry point for all the commands.
+The ```cu``` script in the top-level directory is the common entry point for all the commands, and when invoked without arguments will list all the available commands and global options.
 
 ## cu build-chain
 
@@ -37,7 +37,7 @@ will report certificate files that are due to expire in the next 4 weeks.
 cu find:no-chain directory
 ```
 
-Recursively scan ```directory``` for certificate files and report ones that likely contain no certificate chain. Currently it doesn't verify validity of the chain for the certificate files that do contain them.
+Recursively scan ```directory``` for certificate files and report ones that likely contain no certificate chain. Currently it doesn't verify validity of the chain for the certificate files that do contain it.
 
 Certificate files are defined as files with .crt or .pem extension, and are expected to contain the certificate itself along with its chain.
 
