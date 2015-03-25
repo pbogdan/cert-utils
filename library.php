@@ -88,13 +88,15 @@ function parseFormattedCert($parsedCert)
     return $cert;
 }
 
-function isExpired($cert)
+function isExpired($cert, $expiry = null)
 {
-    $now = time();
+    if (is_null($expiry)) {
+        $expiry = time();
+    }
 
     if (isset($cert["expires"])) {
         // @todo: better validation of expires
-        return $cert["expires"] < $now;
+        return $cert["expires"] < $expiry;
     } else {
         throw new Exception("Certificate without expiration time!");
     }
