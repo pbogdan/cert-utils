@@ -14,7 +14,7 @@ class FindNoChain extends Command
     {
         $this
             ->setName('find:no-chain')
-            ->setDescription('Recursively scan directory for certificate files and report ones that likely contain no certificate chain. Currently it doesn\'t verify validity of the chain for the certificate files that do contain them.')
+            ->setDescription('Recursively scan directory for certificate files and report ones that likely contain no certificate chain. Currently it doesn\'t verify validity of the chain for the certificate files that do contain it.')
             ->addArgument(
                 'directory',
                 InputArgument::REQUIRED,
