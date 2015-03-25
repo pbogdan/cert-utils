@@ -2,30 +2,39 @@
 
 Collection of random SSL-related utilities written in PHP.
 
-## build-chain
+The ```cu``` script in the top-level directory is the common entry point for all the commands.
+
+## cu build-chain
 
 ```
-build-chain file
+cu build-chain path
 ```
 
-Build an intermediate certificate chain for an SSL certificate stored in ```file``` and print it on stdout.
+Build an intermediate certificate chain for an SSL certificate stored in ```path``` and print it on stdout.
 
 The utility assumes that trusted root certificates are located in ```/etc/ssl/certs/```.
 
-## find-expired
+## cu find:expired
 
 ```
-find-expired directory
+cu find:expired [--expiry] directory
 ```
 
-Recursively scan ```directory``` for certificate files and report ones that have expired.
+Recursively scan ```directory``` for certificate files and report ones that have expired. 
 
 Certificate files are defined as files with .crt or .pem extension.
 
-## find-bundles-no-chain
+By default the expiration time is checked against current time, this can be overridden with the optional ```--expiry``` argument which takes string understood by [strtotime() PHP function](http://php.net/strtotime), for example:
+
+``` cu find:expired --expiry="+4 weeks" /ssl-certs/```
+
+will report certificate files that are due to expire in the next 4 weeks.
+
+
+## cu find:no-chain
 
 ```
-find-bundles-no-chain directory
+cu find:no-chain directory
 ```
 
 Recursively scan ```directory``` for certificate files and report ones that likely contain no certificate chain. Currently it doesn't verify validity of the chain for the certificate files that do contain them.
