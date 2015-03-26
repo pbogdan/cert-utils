@@ -32,6 +32,8 @@ class FindExpiredCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $error = $output->getErrorOutput();
+        $fmt = $this->getHelper("formatter");
+
         $dir = new \RecursiveDirectoryIterator($input->getArgument("directory"));
         $iter = new \RecursiveIteratorIterator($dir);
 
@@ -65,11 +67,25 @@ class FindExpiredCommand extends Command
                     $output->writeln("Certificate {$path} expires on {$expirationDate}");
                 }
             } catch(\Exception $e) {
-                //file_put_contents("php://stderr", "^^ Unable to load certificate {$cert}\n");
-                $error->writeln("^^ Unable to load certificate {$path}\n");
+                $msgs = [
+                    "Unable to load {$path}",
+                ];
+
+                if ($output->isVerbose()) {
+                    $msgs = array_merge(
+                        $msgs,
+                        [
+                            "",
+                            "{$e->cmd} said:",
+                            ""
+                        ],
+                        $e->output
+                    );
+                }
+
+                $block = $fmt->formatBlock($msgs, 'error', true);
+                $error->writeln($block);
             }
         }
-
-
     }
 }
