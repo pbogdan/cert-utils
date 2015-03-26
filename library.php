@@ -266,6 +266,7 @@ function buildChain($cert, $certPath)
 
 function execute($cmd)
 {
+    $cmd = $cmd . " 2>&1";
     exec($cmd, $output, $code);
 
     if ($code != 0) {
