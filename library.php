@@ -241,7 +241,8 @@ function buildChain($cert, $certPath)
     try {
         execute($cmd);
     } catch (Exception $e) {
-        throw new Exception("Can't verify the bundle: {$e->output}");
+        $err = implode("\n", $e->output);
+        throw new Exception("Can't verify the bundle: {$err}");
     }
 
     // extract the original cert (it might contain some, or all, parts of the
@@ -271,7 +272,8 @@ function execute($cmd)
 
     if ($code != 0) {
         $e = new \Exception("Command '$cmd' failed exit code $code");
-        $e->output = implode("\n", $output);
+        $e->output = $output;
+        $e->cmd = $cmd;
         throw $e;
     }
 

@@ -35,7 +35,8 @@ class BuildChainCommand extends Command
             list ($inform, $format) = \detectCertFormat($path);
             $cert = \parseFormattedCert(\readCertificate($path, $inform, $format));
         } catch(\Exception $e) {
-            throw new \Exception("Unable to load certificate: {$e->output}");
+            $err = implode("\n", $e->output);
+            throw new \Exception("Unable to load certificate: {$err}");
         }
 
         // perform some basic checks
