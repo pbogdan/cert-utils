@@ -21,12 +21,11 @@ class FindExpiredCommand extends Command
                 'directory to scan'
             )
             ->addOption(
-               'expiry',
-               null,
-               InputOption::VALUE_OPTIONAL,
-               'Reference expiration date'
-            )
-        ;
+                'expiry',
+                null,
+                InputOption::VALUE_OPTIONAL,
+                'Reference expiration date'
+            );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
