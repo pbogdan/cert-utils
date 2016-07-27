@@ -157,7 +157,7 @@ function downloadIssuer($uri)
     return $path;
 }
 
-function buildChain($cert, $certPath)
+function buildChain($cert, $certPath, $includeRoot = false)
 {
     if (isExpired($cert)) {
         throw new Exception("Certificate has expired");
@@ -255,7 +255,9 @@ function buildChain($cert, $certPath)
     $out = implode("\n", execute($cmd));
     $out .= "\n";
 
-    array_pop($chain); // don't include the root certificate
+    if (!$includeRoot) {
+        array_pop($chain);
+    }
 
     foreach ($chain as $i => $path) {
         $out .= file_get_contents(__DIR__ . "/tmp/" . sha1($cert["subject"]) . "-$i.pem");

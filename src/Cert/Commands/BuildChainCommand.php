@@ -19,6 +19,12 @@ class BuildChainCommand extends Command
                 'path',
                 InputArgument::REQUIRED,
                 'path to the certificate'
+            )
+            ->addOption(
+                'include-root',
+                null,
+                InputOption::VALUE_NONE,
+                'whether to include root cert in the chain'
             );
     }
 
@@ -26,6 +32,7 @@ class BuildChainCommand extends Command
     {
         $error = $output->getErrorOutput();
         $path = $input->getArgument("path");
+        $includeRoot = $input->getOption("include-root");
 
         if (!\file_exists($path)) {
             throw new \Exception("File {$path} doesn't exist");
@@ -49,7 +56,7 @@ class BuildChainCommand extends Command
         }
 
         // this can fail with an exception
-        $out = \buildChain($cert, $path);
+        $out = \buildChain($cert, $path, $includeRoot);
         $output->write($out);
     }
 }
