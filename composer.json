@@ -18,5 +18,8 @@
     "config": {
         "bin-dir": "bin/",
         "preferred-install": "dist"
-    }
+    },
+    "bin": [
+        "cu"
+    ]
 }
