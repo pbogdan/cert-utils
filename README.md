@@ -7,10 +7,10 @@ The ```cu``` script in the top-level directory is the common entry point for all
 ## cu build-chain
 
 ```
-cu build-chain path
+cu build-chain [--include-root] path
 ```
 
-Build an intermediate certificate chain for an SSL certificate stored in ```path``` and print it on stdout.
+Build an intermediate certificate chain for an SSL certificate stored in ```path``` and print it on stdout. Use the ```--include-root``` flag if you want to include the root certificate in the generated chain.
 
 The utility assumes that trusted root certificates are located in ```/etc/ssl/certs/```.
 
