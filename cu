@@ -1,8 +1,27 @@
 #!/usr/bin/env php
 <?php
 
-require __DIR__.'/vendor/autoload.php';
+$autoloads = array(
+    __DIR__ . '/../../autoload.php',
+    __DIR__ . '/../vendor/autoload.php',
+    __DIR__ . '/vendor/autoload.php'
+);
 
+$autoload = "";
+
+foreach ($autoloads as $file) {
+    if (file_exists($file)) {
+        $autoload = $file;
+        break;
+    }
+}
+
+if (!$autoload) {
+    echo "Unable to find autoload.php!";
+    exit(1);
+}
+
+require $autoload;
 require __DIR__.'/library.php';
 
 use Cert\Commands\FindExpiredCommand;
