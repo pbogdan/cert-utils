@@ -21,6 +21,9 @@ function detectCertFormat($filePath)
         }
     } else if (preg_match("/BEGIN CERTIFICATE/", $f, $matches)) {
         $inform = "pem";
+    } else if (preg_match("/\.p7c$/", $filePath)) {
+        $fmt    = "pkcs7";
+        $inform = "der";
     } else {
         $inform = "der";
     }
@@ -30,12 +33,21 @@ function detectCertFormat($filePath)
 
 function readCertificate($filePath, $inform, $format)
 {
-    $cmd = sprintf(
-        "openssl %s -noout -text -inform %s -in %s",
-        $format,
-        $inform,
-        escapeshellarg($filePath)
+    if ($format == "x509") {
+        $cmd = sprintf(
+            "openssl %s -noout -text -inform %s -in %s",
+            $format,
+            $inform,
+            escapeshellarg($filePath)
+        );
+    } else {
+        $cmd = sprintf(
+            "openssl %s -text -print_certs -inform %s -in %s",
+            $format,
+            $inform,
+            escapeshellarg($filePath)
     );
+    }
 
     return execute($cmd);
 }
@@ -46,6 +58,20 @@ function parseFormattedCert($parsedCert)
     for ($i = 0; $i < sizeof($parsedCert); $i++) {
         $line = $lines[$i];
         $matches = [];
+
+        if (preg_match("/^\s+Issuer: (.+)$/", $line, $matches)) {
+            // .p7c might contain multiple cert which we don't handle at the
+            // moment so stop processing after the first one
+            if (isset($cert["issuer"])) {
+                break;
+            }
+            $cert["issuer"] = trim($matches[1]);
+        }
+
+        if (preg_match("/^\s+Subject: (.+)/", $line, $matches)) {
+            $cert["subject"] = trim($matches[1]);
+        }
+
 
         if (preg_match("/CA Issuers - URI:(.+)/", $line, $matches)) {
             $cert["issuers"][] = trim($matches[1]);
@@ -61,14 +87,6 @@ function parseFormattedCert($parsedCert)
                 "",
                 trim($lines[++$i])
             );
-        }
-
-        if (preg_match("/^\s+Issuer: (.+)$/", $line, $matches)) {
-            $cert["issuer"] = trim($matches[1]);
-        }
-
-        if (preg_match("/^\s+Subject: (.+)/", $line, $matches)) {
-            $cert["subject"] = trim($matches[1]);
         }
 
         if (preg_match("/^\s+Validity\s*$/", $line)) {
@@ -145,8 +163,9 @@ function findMatchingRoot($cert)
 
 function downloadIssuer($uri)
 {
+    $ext = pathinfo($uri, PATHINFO_EXTENSION);
     $hash = sha1($uri);
-    $path = __DIR__ . "/cache/ca-issuer-$hash.cer";
+    $path = __DIR__ . "/cache/ca-issuer-$hash.$ext";
 
     if (!file_exists($path)) {
         $cmd = sprintf(
@@ -191,6 +210,9 @@ function buildChain($cert, $certPath, $includeRoot = false)
         if (isExpired($c)) {
             throw new Exception("Expired intermediate in the chain");
         }
+        if (areCertsLinked($c, $c)) {
+            break;
+        }
 
         if (!areCertsLinked($c, $old)) {
             $msg = "Intermediate doesn't match previous certificate in the chain";
@@ -201,9 +223,10 @@ function buildChain($cert, $certPath, $includeRoot = false)
 
         if (isset($c["issuers"])) {
             foreach ($c["issuers"] as $i) {
-                if (strpos($i, ".p7c") === false) {
                     $uris[] = $i;
-                }
+                    // we don't currently have a good way of handling multiple
+                    // issuers
+                    break;
             }
         }
     }
