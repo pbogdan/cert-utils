@@ -1,3 +1,4 @@
 cache/ca-issuer-*
 tmp/bundle.crt
 tmp/*.pem
+cache/*.php.cache

@@ -1,5 +1,8 @@
 <?php
 
+use Desarrolla2\Cache\Cache;
+use Desarrolla2\Cache\Adapter\File;
+
 // most of this code is based on Perl code from
 // https://github.com/psypete/public-bin
 function detectCertFormat($filePath)
@@ -206,7 +209,19 @@ function buildChain($cert, $certPath, $includeRoot = false)
     }
 
     // we are at the end of the chain, see if there's matching root CA
-    $chain[] = findMatchingRoot($c);
+    $cacheDir = __DIR__ . '/cache';
+    $adapter = new File($cacheDir);
+    $adapter->setOption('ttl', 600);
+    $cache = new Cache($adapter);
+
+    if (!$cache->get(md5($path) . "-root")) {
+        $root = findMatchingRoot($c);
+        $chain[] = $root;
+        $cache->set(md5($path) . "-root", $root);
+    } else {
+        $chain[] = $cache->get(md5($path) . "-root");
+    }
+
 
     // build certificate bundle
     foreach ($chain as $i => $path) {

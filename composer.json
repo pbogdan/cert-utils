@@ -2,7 +2,8 @@
     "name": "pbogdan/cert-utils",
     "description": "SSL certificate utilites, including intermediate certificate chain generator.",
     "require": {
-        "symfony/console": "2.6.5"
+        "symfony/console": "2.6.5",
+        "desarrolla2/cache": "~2.0"
     },
     "authors": [
         {
